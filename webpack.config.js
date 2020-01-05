@@ -20,7 +20,18 @@ module.exports = {
 
     plugins: [
         new webpack.DefinePlugin({
-            NODE_ENV: JSON.stringify(NODE_ENV)
+            NODE_ENV: JSON.stringify(NODE_ENV),
+            LANG: JSON.stringify('ru')
         })
-    ]
+    ],
+    module: {
+        rules: [
+          {
+            test: /\.(js)$/,
+            exclude: /node_modules/,
+            use: ["babel-loader", "eslint-loader"]
+          }
+        ]
+      },
   };
+  
