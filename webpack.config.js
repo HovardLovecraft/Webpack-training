@@ -24,14 +24,53 @@ module.exports = {
             LANG: JSON.stringify('ru')
         })
     ],
+
+    resolve: {
+      modulesDirectories: ['node_modules'],
+      extensions: ['', '.js']
+    },
+
+    resolveLoader: {
+      modulesDirectories: ['node_modules'],
+      moduleTemplates: ['*-loader', '*'],
+      extensions: ['', '.js']
+    },
+
     module: {
         rules: [
           {
             test: /\.(js)$/,
             exclude: /node_modules/,
             use: ["babel-loader", "eslint-loader"]
+          },
+          {
+            test: /\.css$/,
+            use: [
+              // style-loader
+              { loader: 'style-loader' },
+              // css-loader
+              {
+                loader: 'css-loader',
+                options: {
+                  modules: true
+                }
+              },
+              // sass-loader
+              { loader: 'sass-loader' }
+            ]
           }
         ]
-      },
-  };
-  
+      },  
+};
+
+if(NODE_ENV == 'production') {
+  module.exports.plugins.push(
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false,
+        drop_console: true,
+        unsafe: true
+      }
+    })
+  )
+}
