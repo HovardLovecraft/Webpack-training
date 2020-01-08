@@ -2,12 +2,19 @@
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const webpack = require('webpack');
+const path = require('path');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const pathsToClean = [ 'dist'];
+const cleanOptions = { root: __dirname, verbose: true, dry: false, exclude: [],};
 
 module.exports = {
-    entry: "./home.js",
-    output: {
-      filename: "build.js",
-      library: "home"
+    entry: "./home.ts",
+
+
+    devServer: {
+      contentBase: path.join(__dirname, 'dist'),
+      compress: true,
+      port: 9000
     },
 
     watch: NODE_ENV == 'development',
@@ -25,16 +32,7 @@ module.exports = {
         })
     ],
 
-    resolve: {
-      modulesDirectories: ['node_modules'],
-      extensions: ['', '.js']
-    },
 
-    resolveLoader: {
-      modulesDirectories: ['node_modules'],
-      moduleTemplates: ['*-loader', '*'],
-      extensions: ['', '.js']
-    },
 
     module: {
         rules: [
@@ -44,23 +42,65 @@ module.exports = {
             use: ["babel-loader", "eslint-loader"]
           },
           {
+            test: /\.tsx?$/,
+            use: [
+              {
+                loader: 'ts-loader',
+                options: {
+                  transpileOnly: true
+                }
+              }
+            ],
+            exclude: /node_modules/
+          },
+          {
             test: /\.css$/,
             use: [
-              // style-loader
+              
               { loader: 'style-loader' },
-              // css-loader
+              
               {
                 loader: 'css-loader',
                 options: {
                   modules: true
                 }
               },
-              // sass-loader
+              
               { loader: 'sass-loader' }
             ]
           }
         ]
-      },  
+  },  
+  resolve: {
+    modules: ['node_modules'],
+    extensions: [".js", ".json", ".jsx", ".css", '.tsx', '.ts'],
+    alias: {
+      
+      "module": "new-module",
+      
+      "only-module$": "new-module",
+      
+      "module": path.resolve(__dirname, "app/third/module.js"),
+      
+    }
+  },
+
+  resolveLoader: {
+    modules: ['node_modules'],
+    mainFields: ['*-loader', '*'],
+    extensions: [".js", ".json", ".jsx", ".css", '.tsx', '.ts'],
+    alias: {
+    "module": "new-module",
+    "only-module$": "new-module",
+    "module": path.resolve(__dirname, "app/third/module.js"), 
+    }
+  },
+
+  output: {
+    filename: "build.js",
+    library: "home"
+  },
+
 };
 
 if(NODE_ENV == 'production') {
