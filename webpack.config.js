@@ -16,9 +16,40 @@ module.exports = {
 
   output: {
     filename: '[name].bundle.js',
+    chunkFilename: '[name].bundle.js',
+    publicPath: 'dist/',
     path: path.resolve(__dirname, 'dist'),
     library: "home"
   },
+
+optimization: {
+    splitChunks: {
+        cacheGroups: {
+            vendors: {
+                name: 'vendors',
+                chunks: 'all',
+                reuseExistingChunk: true,
+                priority: 1,
+                enforce: true,
+                test(module, chunks) {
+                    const name = module.nameForCondition && module.nameForCondition();
+                    return chunks.some(chunk => {
+                        return chunk.name === 'main' && /[\\/]node_modules[\\/]/.test(name);
+                    });
+                }
+            },
+            secondary: {
+                name: 'secondary',
+                chunks: 'all',
+                priority: 2,
+                enforce: true,
+                test(module, chunks) {
+                    return chunks.some(chunk => chunk.name === 'secondary');
+                }
+            }
+        }
+    }
+},
 
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
@@ -47,9 +78,15 @@ module.exports = {
   module: {
         rules: [
           {
-            test: /\.(js)$/,
+            test: /\.js$/,
+            use: [
+              'eslint-loader', {
+              loader: 'babel-loader',
+              query: {
+                presets: ['es2015']
+              }
+            }],
             exclude: /node_modules/,
-            use: ["babel-loader", "eslint-loader"]
           },
           {
             test: /\.tsx?$/,

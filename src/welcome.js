@@ -6,7 +6,5 @@ module.exports = function(message) {
         console.log(message);
     }
 
-    
     alert(`Welcome ${message}`);
 }
-
