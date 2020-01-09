@@ -14,13 +14,13 @@ module.exports = {
     user: './src/user.ts'
   },
 
-  output: {
+output: {
     filename: '[name].bundle.js',
     chunkFilename: '[name].bundle.js',
     publicPath: 'dist/',
     path: path.resolve(__dirname, 'dist'),
     library: "home"
-  },
+},
 
 optimization: {
     splitChunks: {
@@ -79,26 +79,18 @@ optimization: {
         rules: [
           {
             test: /\.js$/,
-            use: [
-              'eslint-loader', {
-              loader: 'babel-loader',
-              query: {
-                presets: ['es2015']
-              }
-            }],
-            exclude: /node_modules/,
+            loader: "eslint-loader",
+            exclude: /node_modules/
           },
           {
-            test: /\.tsx?$/,
-            use: [
-              {
-                loader: 'ts-loader',
-                options: {
-                  transpileOnly: true
-                }
+            test: /\.m?js$/,
+            exclude: /(node_modules|bower_components)/,
+            use: {
+              loader: 'babel-loader',
+              options: {
+                presets: ['@babel/preset-env']
               }
-            ],
-            exclude: /node_modules/
+            }
           },
           {
             test: /\.css$/,
