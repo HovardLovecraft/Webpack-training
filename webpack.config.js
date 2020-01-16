@@ -10,7 +10,7 @@ const cleanOptions = { root: __dirname, verbose: true, dry: false, exclude: [],}
 module.exports = {
   entry: {
     app: './src/app.ts',
-    home: './src/home.ts',
+    home: './src/models.ts',
     admin: './src/admin.ts',
     user: './src/user.ts'
   },

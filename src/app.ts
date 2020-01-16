@@ -1,36 +1,50 @@
 'use strict';
 
-class TodoService { 
+class TodoService implements ITodoService, IIdGenerator { 
     
-    static lastId = 0;
+    private static _lastId = 0;
 
-    constructor(private todos : Todo[]) {
-        
+    get nextId(){
+        return TodoService._lastId += 1;
+    }
+
+    constructor(private todos : Todo[]) {   
     }
 
     add(todo: Todo) {
-        var newId = TodoService.getNextId();
+        todo.id = this.nextId;
+        this.todos.push(todo);
+        return todo;
     }
 
-    getAll() {
-        return this.todos;
+    getAll(): Todo[] {
+        let clone = JSON.stringify(this.todos)
+        return JSON.parse(clone)
     }
 
-    static getNextId() {
-        return TodoService.lastId +=1;
+    delete(todoId: number): void{
+        let toDelete = this.getById(todoId);
+
+        let deletedIndex = this.todos.indexOf(toDelete);
+
+        this.todos.splice(deletedIndex, 1);
+    };
+
+    getById(todoId: number): Todo {
+        let filtered = this.todos.filter(data => data.id === todoId);
+
+        if (filtered.length) {
+            return filtered[0]
+        }
+
+        return ;
     }
-}
 
-interface Todo {
-    name : string; 
-    state : number;
-}
-
-enum TodoState {
-    New = 1,
-    Active = 2,
-    Complete = 3,
-    Deleted = 4
+    clone<T>(src: T): T {
+        let clone = JSON.stringify(src);
+        return JSON.parse(clone);
+    };
+    
 }
 
 class SmartTodo {
@@ -62,14 +76,12 @@ class SmartTodo {
     }
 }
 
-class TodoStateChanger {
+abstract class TodoStateChanger {
 
     constructor(private newState: TodoState) {
     }
 
-    canChangeState(todo: Todo): boolean {
-        return !!todo;
-    }
+    abstract canChangeState(todo: Todo): boolean;
 
     changeState(todo: Todo): Todo {
         if(this.canChangeState(todo)){
@@ -77,7 +89,21 @@ class TodoStateChanger {
         }
         return todo;
     }
-    
+
+}
+
+class CompleteTodoStateChanger extends TodoStateChanger {
+
+    constructor() {
+        super(TodoState.Complete);
+    }
+
+    canChangeState(todo: Todo): boolean {
+        return !!todo && (
+            todo.state === TodoState.Active || todo.state === TodoState.Deleted
+        );
+    }
+
 }
 
 let todo = new SmartTodo("pick up drycleaning")
