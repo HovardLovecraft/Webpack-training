@@ -4,6 +4,36 @@
         "tslint:recommended"
     ],
     "jsRules": {},
-    "rules": {},
+    "rules": {
+        "no-internal-module": true,
+        "typedef-whitespace": [
+            true,
+            {
+              "call-signature": "nospace",
+              "index-signature": "nospace",
+              "property-declaration": "nospace",
+              "variable-declaration": "nospace"
+            },
+            {
+              "call-signature": "onespace",
+              "index-signature": "onespace",
+              "property-declaration": "onespace",
+              "variable-declaration": "onespace"
+            }
+          ],
+          "await-promise": true,
+          "curly": [true, "ignore-same-line"],
+          "deprecation": true,
+          "label-position": true,
+          "no-arg": true,
+          "no-conditional-assignment": true,
+          "no-duplicate-imports": true,
+          "no-duplicate-variable": true,
+          "no-empty": true,
+          "no-eval": true,
+          "no-reference-import": true,
+          "no-return-await": true,
+          "no-switch-case-fall-through": true
+    },
     "rulesDirectory": []
 }
