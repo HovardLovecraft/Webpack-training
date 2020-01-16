@@ -9,6 +9,7 @@ const cleanOptions = { root: __dirname, verbose: true, dry: false, exclude: [],}
 
 module.exports = {
   entry: {
+    app: './src/app.ts',
     home: './src/home.ts',
     admin: './src/admin.ts',
     user: './src/user.ts'
@@ -19,7 +20,7 @@ output: {
     chunkFilename: '[name].bundle.js',
     publicPath: 'dist/',
     path: path.resolve(__dirname, 'dist'),
-    library: "home"
+    library: "index"
 },
 
 optimization: {
