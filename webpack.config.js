@@ -8,11 +8,10 @@ const pathsToClean = [ 'dist'];
 const cleanOptions = { root: __dirname, verbose: true, dry: false, exclude: [],};
 
 module.exports = {
+  mode: "development",
+  devtool: "inline-source-map",
   entry: {
     app: './src/app.ts',
-    home: './src/models.ts',
-    admin: './src/admin.ts',
-    user: './src/user.ts'
   },
 
 output: {
@@ -79,19 +78,26 @@ optimization: {
   module: {
         rules: [
           {
-            test: /\.js$/,
+            test: /\.(js|jsx)$/,
             loader: "eslint-loader",
+            include: path.resolve(__dirname, 'src'),
             exclude: /node_modules/
           },
           {
-            test: /\.m?js$/,
+            test: /\.(js|jsx)$/,
+            include: path.resolve(__dirname, 'src'),
             exclude: /(node_modules|bower_components)/,
             use: {
               loader: 'babel-loader',
               options: {
-                presets: ['@babel/preset-env']
+                presets: ['@babel/preset-env', 'es2015']
               }
             }
+          },
+          { 
+            test: /\.tsx?$/, 
+            loader: "ts-loader" ,
+            exclude: /(node_modules|bower_components)/,
           },
           {
             test: /\.css$/,

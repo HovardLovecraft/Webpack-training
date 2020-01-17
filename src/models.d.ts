@@ -3,8 +3,7 @@ export interface Todo {
     name: string;
     state: TodoState;
 }
-
-export enum TodoState {
+export declare enum TodoState {
     Active = 1,
     Complete = 2
 }

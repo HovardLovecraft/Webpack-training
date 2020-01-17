@@ -1,113 +1,71 @@
-'use strict';
+import { Todo, TodoState } from './models';
+import TodoService, { ITodoService } from './TodoService';
+import TodoListComponent from './TodoListComponent';
 
-class TodoService implements ITodoService, IIdGenerator { 
+export class TodoApp {
     
-    private static _lastId = 0;
+    private todoService: ITodoService;
+    private todoList: TodoListComponent;
 
-    get nextId(){
-        return TodoService._lastId += 1;
+    constructor(el, todos) {
+
+        this.todoService = new TodoService(todos);
+        this.initialize(el);
     }
 
-    constructor(private todos : Todo[]) {   
-    }
-
-    add(todo: Todo) {
-        todo.id = this.nextId;
-        this.todos.push(todo);
-        return todo;
-    }
-
-    getAll(): Todo[] {
-        let clone = JSON.stringify(this.todos)
-        return JSON.parse(clone)
-    }
-
-    delete(todoId: number): void{
-        let toDelete = this.getById(todoId);
-
-        let deletedIndex = this.todos.indexOf(toDelete);
-
-        this.todos.splice(deletedIndex, 1);
-    };
-
-    getById(todoId: number): Todo {
-        let filtered = this.todos.filter(data => data.id === todoId);
-
-        if (filtered.length) {
-            return filtered[0]
+    addTodo(todoName) {
+        try {
+            this.todoService.add(todoName);
+        } catch(x) {
+            console.error(x)
         }
-
-        return ;
-    }
-
-    clone<T>(src: T): T {
-        let clone = JSON.stringify(src);
-        return JSON.parse(clone);
-    };
-    
-}
-
-class SmartTodo {
-    
-    _state: TodoState;
-    
-    name: string;
-
-    get state() {
-        return TodoState.Complete;
-    }
-
-    set state(newState) {
         
-        if(newState === TodoState.Complete) {
-
-            var canBeCompleted = this.state === TodoState.Active || this.state === TodoState.Deleted;
-        }
-
-        if (!canBeCompleted){
-            throw "todo must be active or Deled in order to be marked as Completed"
-        }
-
-        this._state = newState;
+        this.renderTodos();
     }
 
-    constructor(name: string){
-        this.name = name;
+    clearCompleted() {
+        this.todoService.clearCompleted();
+        this.renderTodos();
     }
+
+    toggleTodoState(todoId) {
+        this.todoService.toggle(todoId);
+        this.renderTodos();
+    }
+
+    renderTodos() {
+        var todos = this.todoService.getAll();
+        this.todoList.render(todos);
+    }
+
+    initialize(el) {
+
+        var _this = this;
+
+        var addTodoFormEl = el.getElementsByClassName('add-todo')[0],
+            addTodoNameEl = addTodoFormEl.getElementsByTagName('input')[0],
+            todoListEl = el.getElementsByClassName('todo-list')[0],
+            clearCompletedEl = el.getElementsByClassName('clear-completed')[0];
+
+        addTodoFormEl.addEventListener('submit', function(evnt) {
+            _this.addTodo(addTodoNameEl.value)
+            addTodoNameEl.value = '';
+            evnt.preventDefault();
+        });
+
+        todoListEl.addEventListener('todo-toggle', function(evnt) {
+            var todoId = evnt.details.todoId;
+            _this.todoService.toggle(todoId);
+            _this.renderTodos();
+        });
+
+        clearCompletedEl.addEventListener('click', function() {
+            _this.clearCompleted();
+        });
+
+        this.todoList = new TodoListComponent(todoListEl);
+
+        this.renderTodos();
+    }
+
 }
-
-abstract class TodoStateChanger {
-
-    constructor(private newState: TodoState) {
-    }
-
-    abstract canChangeState(todo: Todo): boolean;
-
-    changeState(todo: Todo): Todo {
-        if(this.canChangeState(todo)){
-            todo.state = this.newState;
-        }
-        return todo;
-    }
-
-}
-
-class CompleteTodoStateChanger extends TodoStateChanger {
-
-    constructor() {
-        super(TodoState.Complete);
-    }
-
-    canChangeState(todo: Todo): boolean {
-        return !!todo && (
-            todo.state === TodoState.Active || todo.state === TodoState.Deleted
-        );
-    }
-
-}
-
-let todo = new SmartTodo("pick up drycleaning")
-
-todo.state = TodoState.Complete;
-
-todo.state
