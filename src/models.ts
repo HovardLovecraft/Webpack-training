@@ -1,10 +1,24 @@
+
+export interface ITodoService {
+    add(todo: Todo): Todo;
+    delete(todoId: number): void;
+    getAll(): Todo[];
+    getById(todoId: number): Todo;
+}
+
+export interface IIdGenerator {
+    nextId: number;
+}
+
 export interface Todo {
-    id: number;
-    name: string;
-    state: TodoState;
+    id: number,
+    name : string; 
+    state : number;
 }
 
 export enum TodoState {
-    Active = 1,
-    Complete = 2
+    New = 1,
+    Active = 2,
+    Complete = 3,
+    Deleted = 4
 }

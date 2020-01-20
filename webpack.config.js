@@ -4,6 +4,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const webpack = require('webpack');
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const pathsToClean = [ 'dist'];
 const cleanOptions = { root: __dirname, verbose: true, dry: false, exclude: [],};
 
@@ -17,9 +18,8 @@ module.exports = {
 output: {
     filename: '[name].bundle.js',
     chunkFilename: '[name].bundle.js',
-    publicPath: 'dist/',
+    publicPath: '/',
     path: path.resolve(__dirname, 'dist'),
-    library: "index"
 },
 
 optimization: {
@@ -72,7 +72,11 @@ optimization: {
         }),
         new CleanWebpackPlugin({
             cleanAfterEveryBuildPatterns: ['dist']
-        })
+        }),
+        new HtmlWebpackPlugin({
+          template: __dirname + "/public/index.html",
+          inject: 'body'
+      })
     ],
 
   module: {
